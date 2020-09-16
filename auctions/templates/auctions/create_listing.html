@@ -8,7 +8,15 @@
         {% csrf_token %}
         <div class="form-group">
             {{ form }}
+            <label for="category-select">Select Ctaegory:</label>
+            <br>
+            <select name="category"  class="btn btn-secondary" id="category-select">
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category }}</option>
+                {% endfor %}
+            </select>
         </div>
+        
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 

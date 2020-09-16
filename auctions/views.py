@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -7,12 +8,20 @@ from django.urls import reverse
 from .models import *
 from .forms import * 
 
+
 def index(request):
+    try:
+        user = User.objects.get(username=request.user.username)
+        watchlist = Watchlist.objects.filter(watcher=user).all()
+    except:
+        watchlist = []
     return render(request, "auctions/index.html", {
-        'auction_listings': AuctionListing.objects.filter(is_active=True).all()
+        'auction_listings': AuctionListing.objects.filter(is_active=True).all().order_by('date_created'),
+        'wcount': len(watchlist)
     })
 
 
+@login_required(login_url="login")
 def create_listing(request):
     if request.method == 'POST':
         form = CreateNewListting(request.POST)
@@ -21,20 +30,56 @@ def create_listing(request):
             title = form.cleaned_data['title']
             description = form.cleaned_data['description']
             starting_bid = form.cleaned_data['starting_bid']
-            if form.cleaned_data['image_url'] is not None:
-                image_url = form.cleaned_data['image_url']
-                listing = AuctionListing(title=title, description=description, starting_bid=starting_bid, image_url=image_url, posted_by=user)
-            else:
-                listing = AuctionListing(title=title, description=description, starting_bid=starting_bid, posted_by=user)
-                
+            image_url = form.cleaned_data['image_url']
+            if len(image_url) < 1:
+                image_url = 'https://www.allianceplast.com/wp-content/uploads/2017/11/no-image.png'
+            category = Category.objects.get(pk=int(request.POST['category']))
             
+            listing = AuctionListing(title=title, description=description, starting_bid=starting_bid, image_url=image_url, posted_by=user, category=category)
             listing.save()
             return HttpResponseRedirect(reverse('index'))
 
+
+    user = User.objects.get(username=request.user.username)
+    watchlist = Watchlist.objects.filter(watcher=user).all()
     return render(request, 'auctions/create_listing.html', {
-        'form': CreateNewListting()
+        'form': CreateNewListting(),
+        'categories': Category.objects.all(),
+        'wcount': len(watchlist)
     })
 
+
+@login_required(login_url="login")
+def watchlist(request):
+    user = User.objects.get(username=request.user.username)
+    watchlist = Watchlist.objects.filter(watcher=user).all()
+    return render(request, 'auctions/watchlist.html', {
+        'watchlist': watchlist,
+        'wcount': len(watchlist)
+    })
+
+
+@login_required(login_url="login")
+def categories(request):
+    user = User.objects.get(username=request.user.username)
+    watchlist = Watchlist.objects.filter(watcher=user).all()
+    return render(request, 'auctions/categories.html', {
+        'categories': Category.objects.all(),
+        'wcount': len(watchlist)
+    })
+
+
+@login_required(login_url="login")
+def category_listings(request, category_id):
+    user = User.objects.get(username=request.user.username)
+    watchlist = Watchlist.objects.filter(watcher=user).all()
+    category = Category.objects.get(pk=category_id)
+    listings = category.listings.all()
+    return render(request, 'auctions/category_listings.html', {
+        'category': category,
+        'wcount': len(watchlist),
+        'listings': listings
+    })
 
 def login_view(request):
     if request.method == "POST":
@@ -50,7 +95,7 @@ def login_view(request):
             return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "auctions/login.html", {
-                "message": "Invalid username and/or password."
+                "message": "Invalid username and/or password.",
             })
     else:
         return render(request, "auctions/login.html")

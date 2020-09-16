@@ -1,7 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+    <h3>Active Listings</h3>
     <div class="card-columns mx-auto" style="width: 60%">
         {% for listing in auction_listings %}
         
@@ -10,7 +10,7 @@
                 <div class="card-body">
                     <h5 class="card-title">{{ listing.title }}</h5>
                     <p class="card-text">{{ listing.description }}</p>
-                    <p class="card-text">Starting Bid: <strong class="text-primary">&#36;{{ listing.starting_bid }}</strong></p>
+                    <p class="card-text">Current Price: <strong class="text-primary">&#36;{{ listing.starting_bid }}</strong></p>
                     <p class="card-text"><small class="text-muted">Date Created:  {{ listing.date_created }} </small></p>
                     <a href="#" class="btn btn-primary">View Item</a>
                 </div>
