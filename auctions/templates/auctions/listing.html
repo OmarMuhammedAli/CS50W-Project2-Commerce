@@ -1,0 +1,80 @@
+{% extends 'auctions/layout.html' %}
+
+{% block title %} {{ listing.title }} {% endblock %}
+
+{% block body %}
+
+  <div class="container col-12 float-left">
+      <div class="row">
+          <div class="col-sm">
+              <h3> {{ listing.title }} </h3>
+          </div>
+      </div>
+      <div class="row">
+          <div class="col">
+            <img src="{{ listing.image_url }}" alt="{{ listing.description }}" class="rounded float-left" style="width: 30vw; height: auto;">
+          </div>
+          <div class="col">
+            <h6>Description:</h6>
+            {{ listing.description }}
+          </div>
+          <div class="col">
+            <form class="form-inline" >
+                {% csrf_token %}
+                <div class="form-group mx-sm-3 mb-2">
+                  <label for="bid" class="sr-only">Bid</label>
+                  <input type="text" class="form-control" id="bid" placeholder="Enter Bid Amount" name='new_bid'>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">Place Bid</button>
+            </form>  
+          </div>
+          <div class="col-sm-2">
+            <form class="form-inline">
+                {% csrf_token %}
+              <button type="submit" class="btn btn-secondary mb-2">Add to Watchlist</button>
+            </form>
+          </div>
+      </div>
+      <br>
+      <div class="row">
+          <div class="col">
+            <form >
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col">
+                        <h5>Leave a comment:</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8">
+                        <input type="text" class="form-control col-10" id="comment" placeholder="Your thoughts on the product.." name="new_comment">
+                    </div>
+                    <div class="col-3">
+                        <button type="submit" class="btn btn-secondary mb-2">Publish</button>
+                    </div>
+                </div>
+            </form>
+          </div>
+      </div>
+      <br>
+      <!--Comment section-->
+      <div class="row">
+          <h5 class="col">
+              Comments
+          </h5>
+      </div>
+      <div class="row">
+          <div class="col">
+            <div class="card border-light mb-3 w-75">
+                <div class="card-header">Header</div>
+                <div class="card-body">
+                  <h5 class="card-title">Light card title</h5>
+                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                </div>
+              </div>
+            </div>              
+        </div>
+      
+    </div>
+
+{% endblock %}
