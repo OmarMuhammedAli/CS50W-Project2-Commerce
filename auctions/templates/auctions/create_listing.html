@@ -10,7 +10,8 @@
             {{ form }}
             <label for="category-select">Select Ctaegory:</label>
             <br>
-            <select name="category"  class="btn btn-secondary" id="category-select">
+            <select name="category"  class="custom-select col-sm-2" id="category-select">
+                <option selected>Select Category</option>
                 {% for category in categories %}
                     <option value="{{ category.id }}">{{ category }}</option>
                 {% endfor %}

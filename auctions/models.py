@@ -49,8 +49,8 @@ class Comment(models.Model):
 
 
 class Watchlist(models.Model):
-    watcher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='watchlists')
-    listing = models.ManyToManyField(AuctionListing, blank=True, related_name='watchlists')
+    watcher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='watchlist')
+    listing = models.IntegerField()
 
     def __str__(self):
-        return f'{self.listing}; Watcher: {self.watcher}'
+        return f"{self.watcher}, {self.listing}"

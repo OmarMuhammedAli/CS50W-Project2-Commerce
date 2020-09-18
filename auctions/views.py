@@ -81,6 +81,19 @@ def category_listings(request, category_id):
         'listings': listings
     })
 
+
+@login_required(login_url="login")
+def listing_page(request, listing_id):
+    user = User.objects.get(username=request.user.username)
+    watchlist = Watchlist.objects.filter(watcher=user).all()
+    listing = AuctionListing.objects.get(pk=listing_id)
+    return render(request, 'auctions/listing.html', {
+        'wcount': len(watchlist),
+        'listing': listing
+    })
+
+
+
 def login_view(request):
     if request.method == "POST":
 

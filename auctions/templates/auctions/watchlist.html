@@ -13,7 +13,7 @@
                     <p class="card-text">{{ listing.description }}</p>
                     <p class="card-text">Current Price: <strong class="text-primary">&#36;{{ listing.starting_bid }}</strong></p>
                     <p class="card-text"><small class="text-muted">Date Created:  {{ listing.date_created }} </small></p>
-                    <a href="#" class="btn btn-primary">View Item</a>
+                    <a href="{% url 'listing_page' listing.id %}" class="btn btn-primary">View Item</a>
                 </div>
             </div>
         {% endfor %}
