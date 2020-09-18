@@ -6,6 +6,9 @@ from .models import *
 class CtaegoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
 
+class WatchlistAdmin(admin.ModelAdmin):
+    filter_horizontal = ('listing',)
+
 admin.site.register(AuctionListing)
 admin.site.register(Category, CtaegoryAdmin)
-admin.site.register(Watchlist)
+admin.site.register(Watchlist, WatchlistAdmin)

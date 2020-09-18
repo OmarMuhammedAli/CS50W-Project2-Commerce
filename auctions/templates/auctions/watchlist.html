@@ -16,6 +16,8 @@
                     <a href="{% url 'listing_page' listing.id %}" class="btn btn-primary">View Item</a>
                 </div>
             </div>
+        {% empty %}
+            <p><strong>Your watchlist has no listings</strong></p>
         {% endfor %}
     </div>
 

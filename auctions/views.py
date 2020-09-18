@@ -12,12 +12,13 @@ from .forms import *
 def index(request):
     try:
         user = User.objects.get(username=request.user.username)
-        watchlist = Watchlist.objects.filter(watcher=user).all()
+        watchlist = Watchlist.objects.get(watcher=user)
+        wcount = len(watchlist.listing.all())
     except:
-        watchlist = []
+        wcount = 0
     return render(request, "auctions/index.html", {
         'auction_listings': AuctionListing.objects.filter(is_active=True).all().order_by('date_created'),
-        'wcount': len(watchlist)
+        'wcount': wcount
     })
 
 
@@ -41,43 +42,85 @@ def create_listing(request):
 
 
     user = User.objects.get(username=request.user.username)
-    watchlist = Watchlist.objects.filter(watcher=user).all()
+    try: 
+        watchlist = Watchlist.objects.get(watcher=user)
+    except:
+        watchlist = Watchlist()
+        watchlist.watcher = user
+        watchlist.save()
     return render(request, 'auctions/create_listing.html', {
         'form': CreateNewListting(),
         'categories': Category.objects.all(),
-        'wcount': len(watchlist)
+        'wcount': len(watchlist.listing.all())
     })
 
 
 @login_required(login_url="login")
 def watchlist(request):
     user = User.objects.get(username=request.user.username)
-    watchlist = Watchlist.objects.filter(watcher=user).all()
+    try: 
+        watchlist = Watchlist.objects.get(watcher=user)
+    except (UnboundLocalError, Watchlist.DoesNotExist):
+        watchlist = Watchlist()
+        watchlist.watcher = user
+        watchlist.save()
+    #listing_in_watchlist = [w.listing for w in watchlist]
     return render(request, 'auctions/watchlist.html', {
-        'watchlist': watchlist,
-        'wcount': len(watchlist)
+        'watchlist': watchlist.listing.all(),
+        'wcount': len(watchlist.listing.all())
     })
+
+
+@login_required(login_url="login")
+def toggle_watchlist(request, listing_id):
+    user = User.objects.get(username=request.user.username)
+    try:
+        watchlist = Watchlist.objects.get(watcher=user)
+    except:
+        watchlist = Watchlist()
+        watchlist.watcher = user
+        watchlist.save()
+    
+    is_watched = bool(Watchlist.objects.filter(watcher=user, listing=AuctionListing.objects.get(pk=listing_id)))
+    if is_watched:
+        watchlist.listing.remove(AuctionListing.objects.get(pk=listing_id))
+        
+    else:
+        watchlist.listing.add(AuctionListing.objects.get(pk=listing_id))
+        
+    return HttpResponseRedirect(reverse('watchlist'))
+
 
 
 @login_required(login_url="login")
 def categories(request):
     user = User.objects.get(username=request.user.username)
-    watchlist = Watchlist.objects.filter(watcher=user).all()
+    try: 
+        watchlist = Watchlist.objects.get(watcher=user)
+    except:
+        watchlist = Watchlist()
+        watchlist.watcher = user
+        watchlist.save()
     return render(request, 'auctions/categories.html', {
         'categories': Category.objects.all(),
-        'wcount': len(watchlist)
+        'wcount': len(watchlist.listing.all())
     })
 
 
 @login_required(login_url="login")
 def category_listings(request, category_id):
     user = User.objects.get(username=request.user.username)
-    watchlist = Watchlist.objects.filter(watcher=user).all()
+    try: 
+        watchlist = Watchlist.objects.get(watcher=user)
+    except:
+        watchlist = Watchlist()
+        watchlist.watcher = user
+        watchlist.save()
     category = Category.objects.get(pk=category_id)
     listings = category.listings.all()
     return render(request, 'auctions/category_listings.html', {
         'category': category,
-        'wcount': len(watchlist),
+        'wcount': len(watchlist.listing.all()),
         'listings': listings
     })
 
@@ -85,11 +128,18 @@ def category_listings(request, category_id):
 @login_required(login_url="login")
 def listing_page(request, listing_id):
     user = User.objects.get(username=request.user.username)
-    watchlist = Watchlist.objects.filter(watcher=user).all()
+    try: 
+        watchlist = Watchlist.objects.get(watcher=user)
+    except:
+        watchlist = Watchlist()
+        watchlist.watcher = user
+        watchlist.save()
     listing = AuctionListing.objects.get(pk=listing_id)
+    is_watched = bool(Watchlist.objects.filter(watcher=user, listing=listing))
     return render(request, 'auctions/listing.html', {
-        'wcount': len(watchlist),
-        'listing': listing
+        'wcount': len(watchlist.listing.all()),
+        'listing': listing,
+        'is_watched': is_watched
     })
 
 
