@@ -12,3 +12,5 @@ class WatchlistAdmin(admin.ModelAdmin):
 admin.site.register(AuctionListing)
 admin.site.register(Category, CtaegoryAdmin)
 admin.site.register(Watchlist, WatchlistAdmin)
+admin.site.register(Bid)
+admin.site.register(Comment)

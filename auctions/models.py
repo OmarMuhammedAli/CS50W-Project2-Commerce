@@ -17,7 +17,8 @@ class Category(models.Model):
 class AuctionListing(models.Model):
     title = models.CharField(max_length=64)
     description = models.CharField(max_length=70)
-    starting_bid = models.DecimalField(max_digits=10, decimal_places=2)
+    starting_bid = models.FloatField()
+    highest_bid = models.FloatField(default=0.0)
     date_created = models.DateTimeField(default=datetime.today())
     posted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='listings')
     image_url = models.CharField(max_length=250)
@@ -30,7 +31,7 @@ class AuctionListing(models.Model):
 
 class Bid(models.Model):
     listing = models.ForeignKey(AuctionListing, on_delete=models.CASCADE, related_name='bids')
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.FloatField()
     bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bids')
     date_created = models.DateTimeField(default=datetime.today())
 

@@ -18,8 +18,12 @@
             <h6>Description:</h6>
             {{ listing.description }}
           </div>
+          
+          {% if listing.is_active %}
+          
+          {% if not is_owner %}
           <div class="col">
-            <form class="form-inline" >
+            <form class="form-inline" action="{% url 'add_bid' listing.id %}" method="POST">
                 {% csrf_token %}
                 <div class="form-group mx-sm-3 mb-2">
                   <label for="bid" class="sr-only">Bid</label>
@@ -27,22 +31,69 @@
                 </div>
                 <button type="submit" class="btn btn-primary mb-2">Place Bid</button>
             </form>  
+            
+              {% if messages %}
+              <ul>
+                  {% for message in messages %}
+                  {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR and message.extra_tags == 'new_bid' %}
+                  <div class="alert alert-danger" role="alert">{{ message }}</div>
+                  {% endif %}
+                  {% endfor %}
+              </ul>
+              {% endif %}
+            
           </div>
           <div class="col-sm-2">
             <form class="form-inline" action="{% url 'toggle_watchlist' listing.id %}" method="POST">
               {% csrf_token %}
-              {%if is_watched %}
+              {% if is_watched %}
                 <button type="submit" class="btn btn-secondary mb-2">Remove from Watchlist</button>
               {% else %}
                 <button type="submit" class="btn btn-secondary mb-2">Add to Watchlist</button>
               {% endif %}
             </form>
           </div>
+
+          {% else %}
+          <div class="col">
+            <form action="{% url 'close' listing.id %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger mb-2">Close Auction</button>
+            </form>
+          </div>
+          {% endif %}
+
+          {% else %}
+            
+          <div class="col">
+              {% if is_winner %}
+              <div class="alert alert-success" role="alert">
+                Congratulations! You've won this auction!
+              </div>
+            
+            {% else %}
+            <div class="alert alert-info" role="alert">
+              This auction is no longer available.
+            </div>
+            {% endif %}
+          </div>
+            {% endif %}
+
+      </div>
+      <br>
+      <div class="row">
+        <div class="col">
+          {% if listing.starting_bid >= listing.highest_bid %}
+          <p class="card-text">Current Price: <strong class="text-success">&#36;{{ listing.starting_bid }}</strong></p>
+          {% else %}
+          <p class="card-text">Current Price: <strong class="text-success">&#36;{{ listing.highest_bid }}</strong></p>
+      {% endif %}
+        </div>
       </div>
       <br>
       <div class="row">
           <div class="col">
-            <form >
+            <form action="{% url 'comment' listing.id %}" method="POST">
                 {% csrf_token %}
                 <div class="row">
                     <div class="col">
@@ -69,13 +120,18 @@
       </div>
       <div class="row">
           <div class="col">
+            {% for comment in comments %}
             <div class="card border-light mb-3 w-75">
-                <div class="card-header">Header</div>
-                <div class="card-body">
-                  <h5 class="card-title">Light card title</h5>
-                  <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <div class="card-header">
+                  <p>By <strong>{{ comment.commenter.username }} </strong> <small class="text-muted"><strong>On</strong> {{ comment.date_created }}</small></p>
                 </div>
-              </div>
+                <div class="card-body">
+                  <p class="card-text"> {{ comment.comment }} </p>
+                </div>
+            </div>
+            {% empty %}
+              <p>No comments, yet. Be the first!</p>
+            {% endfor %}
             </div>              
         </div>
       
